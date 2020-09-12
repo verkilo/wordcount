@@ -39,7 +39,6 @@ history = if File.exist?(wc_file)
   f = File.open(wc_file)
   x = f.read()
   f.close
-  # puts "Before", x
   YAML.load(x)
 else
   {}
@@ -53,7 +52,6 @@ Dir["**/.book"].each do |target|
   book = File.basename(target)
 
   # Combine into one file for consistency & debugging
-  # puts "Counting '#{book}'"
   src = getBuildFilename(target, "src.md")
   t = Dir["./#{target}/**/*.md"].sort.map { |f| File.open(f,'r').read }.join("\n")
   f = File.open(src,'w')
@@ -66,9 +64,9 @@ Dir["**/.book"].each do |target|
   puts "..'#{book}': #{x.to_i}"
   history[@today][book] = x.to_i
 end
-history = YAML.dump(history)
-# puts history
+history[@today]['total'] = history[@today].map{|k,v| v}.inject(0, :+)
+
 # Write to local file
 f = File.open(wc_file, 'w')
-f.write(history)
+f.write(YAML.dump(history))
 f.close
